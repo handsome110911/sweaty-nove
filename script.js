@@ -87,3 +87,56 @@ function removeLastItem() {
   renderItems();
   drawWheel();
 }
+
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+let spinning = false;
+
+function drawWheel() {
+  const total = getTotalProbability();
+  const radius = canvas.width / 2;
+  let startAngle = 0;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  items.forEach(item => {
+    const sliceAngle = (item.probability / total) * 2 * Math.PI;
+
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = randomColor(item.name);
+    ctx.fill();
+
+    ctx.fillStyle = '#000';
+    ctx.font = '14px sans-serif';
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(startAngle + sliceAngle / 2);
+    ctx.textAlign = 'right';
+    ctx.fillText(item.name, radius - 10, 0);
+    ctx.restore();
+
+    startAngle += sliceAngle;
+  });
+
+  drawPointer();
+}
+
+function drawPointer() {
+  const r = canvas.width / 2;
+  ctx.fillStyle = 'red';
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(r - 10, 20);
+  ctx.lineTo(r + 10, 20);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function randomColor(seed) {
+  const hash = seed.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const hue = hash % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+}
