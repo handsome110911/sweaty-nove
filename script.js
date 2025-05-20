@@ -65,9 +65,22 @@ function autoAdjustNone() {
 }
 
 function addItem() {
-  if (getTotalProbability() >= 100) return alert("無法新增：總機率已達 100%");
-  items.push({ name: `項目${items.length}`, probability: 0 });
-  autoAdjustNone();
+  const newItem = { name: `項目${items.length}`, probability: 0 };
+  items.push(newItem);
+  const base = Math.floor(100 / items.length);
+  let total = base * items.length;
+  let diff = 100 - total;
+
+  // 將每個設為 base，最後一個補差值
+  items.forEach((item, i) => {
+    item.probability = base;
+  });
+
+  // 補足 100%，給最後一項
+  if (diff !== 0) {
+    items[items.length - 1].probability += diff;
+  }
+
   renderItems();
   drawWheel();
 }
